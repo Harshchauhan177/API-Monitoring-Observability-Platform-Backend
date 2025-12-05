@@ -9,54 +9,58 @@ import com.harsh.monitoring.collector_service.repositories.metadata.AlertReposit
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/logs")
 class LogController(
     private val logRepo: LogEntryRepository,
     private val rateRepo: RateLimitHitRepository,
     private val alertRepo: AlertRepository
 ) {
 
-    @PostMapping("/logs")
+    @PostMapping
     fun saveLog(@RequestBody log: LogEntry): String {
         logRepo.save(log)
 
-        // CREATE ALERTS
         if (log.latencyMs > 500) {
-            alertRepo.save(Alert(
-                serviceName = log.serviceName,
-                endpoint = log.endpoint,
-                message = "Slow API detected (>500ms)",
-                alertType = "slow_api"
-            ))
+            alertRepo.save(
+                Alert(
+                    serviceName = log.serviceName,
+                    endpoint = log.endpoint,
+                    message = "Slow API detected (>500ms)",
+                    alertType = "slow_api"
+                )
+            )
         }
 
         if (log.statusCode >= 500) {
-            alertRepo.save(Alert(
-                serviceName = log.serviceName,
-                endpoint = log.endpoint,
-                message = "Server error detected (5xx)",
-                alertType = "error_5xx"
-            ))
+            alertRepo.save(
+                Alert(
+                    serviceName = log.serviceName,
+                    endpoint = log.endpoint,
+                    message = "Server error detected (5xx)",
+                    alertType = "error_5xx"
+                )
+            )
         }
 
         return "Log saved"
     }
 
-    @PostMapping("/rate-limit-hit")
-    fun saveRateLimitHit(@RequestBody rateHit: RateLimitHit): String {
-        rateRepo.save(rateHit)
+    @PostMapping("/rate-limit")
+    fun saveRateLimitHit(@RequestBody hit: RateLimitHit): String {
+        rateRepo.save(hit)
 
-        alertRepo.save(Alert(
-            serviceName = rateHit.serviceName,
-            endpoint = "",
-            message = "Rate limit exceeded",
-            alertType = "rate_limit"
-        ))
+        alertRepo.save(
+            Alert(
+                serviceName = hit.serviceName,
+                endpoint = "",
+                message = "Rate limit exceeded",
+                alertType = "rate_limit"
+            )
+        )
 
         return "Rate limit hit saved"
     }
 
-    @GetMapping("/logs/all")
-    fun getAllLogs(): List<LogEntry> =
-        logRepo.findAll()
+    @GetMapping("/all")
+    fun getAllLogs(): List<LogEntry> = logRepo.findAll()
 }

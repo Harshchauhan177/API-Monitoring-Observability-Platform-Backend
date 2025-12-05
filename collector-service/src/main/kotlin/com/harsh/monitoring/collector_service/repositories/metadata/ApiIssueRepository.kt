@@ -1,21 +1,26 @@
 package com.harsh.monitoring.collector_service.repositories.metadata
 
 import com.harsh.monitoring.collector_service.models.metadata.ApiIssue
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.mongodb.core.MongoTemplate
-import org.springframework.stereotype.Repository
-import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.stereotype.Repository
 
 @Repository
 class ApiIssueRepository(
-    private val metadataMongoTemplate: MongoTemplate
+    @Qualifier("metadataMongoTemplate")
+    private val mongoTemplate: MongoTemplate
 ) {
-    fun save(issue: ApiIssue): ApiIssue =
-        metadataMongoTemplate.save(issue)
 
-    fun findUnresolved(): List<ApiIssue> =
-        metadataMongoTemplate.find(
-            Query(Criteria.where("isResolved").`is`(false)),
-            ApiIssue::class.java
-        )
+    fun save(issue: ApiIssue): ApiIssue =
+        mongoTemplate.save(issue, "issues")
+
+    fun findAll(): List<ApiIssue> =
+        mongoTemplate.find(Query(), ApiIssue::class.java, "issues")
+
+    fun findUnresolved(): List<ApiIssue> {
+        val query = Query.query(Criteria.where("resolved").`is`(false))
+        return mongoTemplate.find(query, ApiIssue::class.java, "issues")
+    }
 }

@@ -7,9 +7,19 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/alerts")
 class AlertController(
-    private val repo: AlertRepository
+    private val alertRepo: AlertRepository
 ) {
-    @GetMapping("/all")
-    fun getAllAlerts(): List<Alert> =
-        repo.findAll()
+
+    @GetMapping
+    fun getAllAlerts(): List<Alert> = alertRepo.findAll()
+
+    @PostMapping
+    fun createAlert(@RequestBody alert: Alert): Alert =
+        alertRepo.save(alert)
+
+    @DeleteMapping("/{id}")
+    fun deleteAlert(@PathVariable id: String): String {
+        alertRepo.deleteById(id)
+        return "Alert deleted"
+    }
 }

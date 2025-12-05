@@ -10,24 +10,26 @@ class IssueController(
     private val issueRepo: ApiIssueRepository
 ) {
 
-    @PostMapping("/create")
-    fun createIssue(@RequestBody issue: ApiIssue): String {
+    @GetMapping
+    fun getAllIssues(): List<ApiIssue> = issueRepo.findAll()
+
+    @GetMapping("/unresolved")
+    fun getUnresolved(): List<ApiIssue> =
+        issueRepo.findUnresolved().map { it.copy() }
+
+    @PostMapping
+    fun createIssue(@RequestBody issue: ApiIssue): ApiIssue =
         issueRepo.save(issue)
-        return "Issue created"
-    }
 
-    @PostMapping("/{id}/resolve")
+    @PutMapping("/{id}/resolve")
     fun resolveIssue(@PathVariable id: String): String {
-        val allIssues = issueRepo.findUnresolved()
-        val issue = allIssues.find { it.id == id } ?: return "Issue not found"
+        val issues = issueRepo.findUnresolved()
+        val match = issues.find { it.id == id }
+            ?: return "Issue not found"
 
-        val resolved = issue.copy(isResolved = true, resolvedAt = java.time.Instant.now())
+        val resolved = match.copy(resolved = true)
         issueRepo.save(resolved)
 
         return "Issue resolved"
     }
-
-    @GetMapping("/unresolved")
-    fun getUnresolved(): List<ApiIssue> =
-        issueRepo.findUnresolved()
 }
