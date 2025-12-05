@@ -1,3 +1,10 @@
+server:
+  port: 8080
+
 spring:
-  application:
-    name: collector-service
+  data:
+    mongodb:
+      logs:
+        uri: mongodb://localhost:27017/logs-db
+      metadata:
+        uri: mongodb://localhost:27018/metadata-db
