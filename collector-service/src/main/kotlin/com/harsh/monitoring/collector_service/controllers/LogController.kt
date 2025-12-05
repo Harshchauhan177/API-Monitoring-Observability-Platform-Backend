@@ -3,9 +3,11 @@ package com.harsh.monitoring.collector_service.controllers
 import com.harsh.monitoring.collector_service.models.logs.LogEntry
 import com.harsh.monitoring.collector_service.models.logs.RateLimitHit
 import com.harsh.monitoring.collector_service.models.metadata.Alert
+import com.harsh.monitoring.collector_service.models.metadata.ApiIssue
 import com.harsh.monitoring.collector_service.repositories.logs.LogEntryRepository
 import com.harsh.monitoring.collector_service.repositories.logs.RateLimitHitRepository
 import com.harsh.monitoring.collector_service.repositories.metadata.AlertRepository
+import com.harsh.monitoring.collector_service.repositories.metadata.ApiIssueRepository
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,7 +15,8 @@ import org.springframework.web.bind.annotation.*
 class LogController(
     private val logRepo: LogEntryRepository,
     private val rateRepo: RateLimitHitRepository,
-    private val alertRepo: AlertRepository
+    private val alertRepo: AlertRepository,
+    private val issueRepo: ApiIssueRepository
 ) {
 
     @PostMapping
@@ -32,12 +35,22 @@ class LogController(
         }
 
         if (log.statusCode >= 500) {
+
             alertRepo.save(
                 Alert(
                     serviceName = log.serviceName,
                     endpoint = log.endpoint,
                     message = "Server error detected (5xx)",
                     alertType = "error_5xx"
+                )
+            )
+
+            issueRepo.save(
+                ApiIssue(
+                    serviceName = log.serviceName,
+                    endpoint = log.endpoint,
+                    errorMessage = "Internal server error (5xx)",
+                    issueType = "server_error"
                 )
             )
         }
@@ -55,6 +68,15 @@ class LogController(
                 endpoint = "",
                 message = "Rate limit exceeded",
                 alertType = "rate_limit"
+            )
+        )
+
+        issueRepo.save(
+            ApiIssue(
+                serviceName = hit.serviceName,
+                endpoint = "",
+                errorMessage = "Rate limit exceeded",
+                issueType = "rate_limit"
             )
         )
 

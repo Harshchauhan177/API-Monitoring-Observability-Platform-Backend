@@ -8,7 +8,7 @@ data class ApiIssue(
     @Id val id: String? = null,
     val serviceName: String,
     val endpoint: String,
-    val issueType: String,
-    val resolved: Boolean = false,
-    val timestamp: Long = System.currentTimeMillis()
+    val errorMessage: String,
+    val issueType: String,   // <-- required by controller
+    val resolved: Boolean = false
 )

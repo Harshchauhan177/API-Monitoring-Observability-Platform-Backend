@@ -37,3 +37,16 @@ Content-Type: application/json
   "statusCode": 600,
   "latencyMs": 123
 }
+
+### ANOTHER TEST LOG ENTRY
+
+POST http://localhost:8080/api/logs
+Content-Type: application/json
+
+{
+  "serviceName": "kuchbhi",
+  "endpoint": "/process",
+  "method": "POST",
+  "statusCode": 600,
+  "latencyMs": 219
+}
