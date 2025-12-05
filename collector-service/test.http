@@ -10,3 +10,30 @@ Content-Type: application/json
   "statusCode": 200,
   "latencyMs": 450
 }
+
+
+### ANOTHER TEST LOG ENTRY
+
+POST http://localhost:8080/api/logs
+Content-Type: application/json
+
+{
+  "serviceName": "orders",
+  "endpoint": "/place",
+  "method": "POST",
+  "statusCode": 200,
+  "latencyMs": 123
+}
+
+### ANOTHER TEST LOG ENTRY
+
+POST http://localhost:8080/api/logs
+Content-Type: application/json
+
+{
+  "serviceName": "payment",
+  "endpoint": "/process",
+  "method": "POST",
+  "statusCode": 600,
+  "latencyMs": 123
+}

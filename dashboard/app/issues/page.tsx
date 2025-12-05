@@ -1,43 +1,41 @@
-"use client";
-import { useEffect, useState } from "react";
+import { fetchAPI } from "@/lib/api";
 
-export default function IssuesPage() {
-  const [issues, setIssues] = useState([]);
+interface ApiIssue {
+  id: string;
+  serviceName: string;
+  endpoint: string;
+  description: string;
+  resolved: boolean;
+  timestamp: string;
+}
 
-  function load() {
-    fetch("http://localhost:8080/api/issues/unresolved")
-      .then((res) => res.json())
-      .then((data) => setIssues(data));
-  }
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  function resolve(id: string) {
-    fetch(`http://localhost:8080/api/issues/${id}/resolve`, {
-      method: "POST",
-    }).then(() => load());
-  }
+export default async function IssuesPage() {
+  const issues = await fetchAPI<ApiIssue[]>("/api/issues/unresolved");
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-4">Unresolved Issues</h1>
+      <h1 className="text-2xl font-semibold mb-4">Unresolved API Issues</h1>
 
-      {issues.map((i: any) => (
-        <div key={i.id} className="border p-3 mb-3 rounded">
-          <p>
-            <b>{i.issueType}</b> — {i.endpoint}
-          </p>
+      {issues.length === 0 && (
+        <p className="text-gray-600">No unresolved issues 🎉</p>
+      )}
 
-          <button
-            onClick={() => resolve(i.id)}
-            className="mt-2 bg-green-600 text-white px-3 py-1 rounded"
-          >
-            Resolve
-          </button>
-        </div>
-      ))}
+      <div className="grid grid-cols-1 gap-4">
+        {issues.map((issue) => (
+          <div key={issue.id} className="p-4 border rounded-lg bg-white shadow">
+            <h2 className="font-bold text-lg text-orange-600">
+              ⚠️ Issue in {issue.serviceName}
+            </h2>
+
+            <p className="text-gray-700">Endpoint: {issue.endpoint}</p>
+            <p className="font-semibold text-red-700">{issue.description}</p>
+
+            <p className="text-gray-500 text-sm mt-2">
+              {new Date(issue.timestamp).toLocaleString()}
+            </p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
