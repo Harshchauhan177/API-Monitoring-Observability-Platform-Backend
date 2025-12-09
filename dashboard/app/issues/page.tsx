@@ -10,7 +10,14 @@ interface ApiIssue {
   errorMessage: string;
   issueType: string;
   resolved: boolean;
+  version?: number;  // For optimistic locking
   timestamp?: number;
+}
+
+interface ResolveResponse {
+  success: boolean;
+  message: string;
+  conflict?: boolean;
 }
 
 export default function IssuesPage() {
@@ -35,7 +42,7 @@ export default function IssuesPage() {
     loadIssues();
   }, []);
 
-  async function resolveIssue(issueId: string) {
+  async function resolveIssue(issueId: string, version?: number) {
     setResolving(issueId);
     try {
       const token = localStorage.getItem("token");
@@ -45,13 +52,24 @@ export default function IssuesPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({ version }),
       });
 
       if (response.ok) {
-        // Reload issues after resolving
-        await loadIssues();
+        const result: ResolveResponse = await response.json();
+        if (result.success) {
+          // Reload issues after resolving
+          await loadIssues();
+        } else if (result.conflict) {
+          alert(result.message || "Issue was modified by another user. Refreshing...");
+          // Reload to get latest version
+          await loadIssues();
+        } else {
+          alert(result.message || "Failed to resolve issue.");
+        }
       } else {
-        alert("Failed to resolve issue. Please try again.");
+        const error = await response.json().catch(() => ({ message: "Unknown error" }));
+        alert(error.message || "Failed to resolve issue. Please try again.");
       }
     } catch (err) {
       console.error("Failed to resolve issue:", err);
@@ -103,7 +121,7 @@ export default function IssuesPage() {
                 )}
               </div>
               <button
-                onClick={() => resolveIssue(issue.id!)}
+                onClick={() => resolveIssue(issue.id!, issue.version)}
                 disabled={resolving === issue.id}
                 className="ml-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >

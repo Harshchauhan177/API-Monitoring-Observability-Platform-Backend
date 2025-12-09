@@ -18,8 +18,13 @@ class AlertRepository(
     fun findAll(): List<Alert> =
         mongoTemplate.find(Query(), Alert::class.java, "alerts")
 
+    fun findById(id: String): Alert? {
+        val query = Query.query(org.springframework.data.mongodb.core.query.Criteria.where("_id").`is`(id))
+        return mongoTemplate.findOne(query, Alert::class.java, "alerts")
+    }
+
     fun deleteById(id: String) {
-        val query = Query.query(org.springframework.data.mongodb.core.query.Criteria.where("id").`is`(id))
+        val query = Query.query(org.springframework.data.mongodb.core.query.Criteria.where("_id").`is`(id))
         mongoTemplate.remove(query, Alert::class.java, "alerts")
     }
 }

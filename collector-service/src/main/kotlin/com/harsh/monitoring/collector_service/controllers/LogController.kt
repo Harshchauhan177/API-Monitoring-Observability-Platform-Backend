@@ -1,11 +1,14 @@
 package com.harsh.monitoring.collector_service.controllers
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.harsh.monitoring.collector_service.models.logs.LogEntry
 import com.harsh.monitoring.collector_service.models.logs.RateLimitHit
 import com.harsh.monitoring.collector_service.models.metadata.Alert
+import com.harsh.monitoring.collector_service.models.metadata.AlertAuditTrail
 import com.harsh.monitoring.collector_service.models.metadata.ApiIssue
 import com.harsh.monitoring.collector_service.repositories.logs.LogEntryRepository
 import com.harsh.monitoring.collector_service.repositories.logs.RateLimitHitRepository
+import com.harsh.monitoring.collector_service.repositories.metadata.AlertAuditTrailRepository
 import com.harsh.monitoring.collector_service.repositories.metadata.AlertRepository
 import com.harsh.monitoring.collector_service.repositories.metadata.ApiIssueRepository
 import org.springframework.web.bind.annotation.*
@@ -16,15 +19,30 @@ class LogController(
     private val logRepo: LogEntryRepository,
     private val rateRepo: RateLimitHitRepository,
     private val alertRepo: AlertRepository,
+    private val alertAuditRepo: AlertAuditTrailRepository,
     private val issueRepo: ApiIssueRepository
 ) {
+
+    private val mapper = ObjectMapper()
+
+    private fun saveAlertWithAudit(alert: Alert) {
+        val saved = alertRepo.save(alert)
+        alertAuditRepo.save(
+            AlertAuditTrail(
+                alertId = saved.id!!,
+                action = "created",
+                previousState = "none",
+                newState = mapper.writeValueAsString(saved)
+            )
+        )
+    }
 
     @PostMapping
     fun saveLog(@RequestBody log: LogEntry): String {
         logRepo.save(log)
 
         if (log.latencyMs > 500) {
-            alertRepo.save(
+            saveAlertWithAudit(
                 Alert(
                     serviceName = log.serviceName,
                     endpoint = log.endpoint,
@@ -35,8 +53,7 @@ class LogController(
         }
 
         if (log.statusCode >= 500) {
-
-            alertRepo.save(
+            saveAlertWithAudit(
                 Alert(
                     serviceName = log.serviceName,
                     endpoint = log.endpoint,
@@ -62,7 +79,7 @@ class LogController(
     fun saveRateLimitHit(@RequestBody hit: RateLimitHit): String {
         rateRepo.save(hit)
 
-        alertRepo.save(
+        saveAlertWithAudit(
             Alert(
                 serviceName = hit.serviceName,
                 endpoint = "",

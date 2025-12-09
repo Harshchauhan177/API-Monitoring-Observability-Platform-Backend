@@ -44,11 +44,11 @@ POST http://localhost:8080/api/logs
 Content-Type: application/json
 
 {
-  "serviceName": "kuchbhi",
+  "serviceName": "payment_tools",
   "endpoint": "/process",
   "method": "POST",
-  "statusCode": 900,
-  "latencyMs": 219
+  "statusCode": 90,
+  "latencyMs": 5
 }
 
 
