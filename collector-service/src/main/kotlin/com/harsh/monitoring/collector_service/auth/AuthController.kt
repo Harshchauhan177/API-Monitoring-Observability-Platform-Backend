@@ -12,13 +12,30 @@ class AuthController(
 ) {
 
     @PostMapping("/register")
-    fun register(@RequestBody user: UserAccount): String {
-        if (userRepo.findByUsername(user.username) != null) {
-            return "User already exists"
+    fun register(@RequestBody req: Map<String, String>): Map<String, String> {
+        val username = req["username"] ?: return mapOf("error" to "username missing")
+        val password = req["password"] ?: return mapOf("error" to "password missing")
+
+        if (userRepo.findByUsername(username) != null) {
+            return mapOf("error" to "User already exists")
         }
 
+        if (username.isBlank()) {
+            return mapOf("error" to "Username cannot be empty")
+        }
+
+        if (password.length < 3) {
+            return mapOf("error" to "Password must be at least 3 characters")
+        }
+
+        val user = UserAccount(
+            username = username,
+            password = password,
+            role = "USER"
+        )
+
         userRepo.save(user)
-        return "User registered"
+        return mapOf("message" to "User registered successfully")
     }
 
     @PostMapping("/login")

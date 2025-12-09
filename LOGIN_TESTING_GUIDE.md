@@ -1,4 +1,4 @@
-# Login Functionality Testing Guide
+# Login & Signup Functionality Testing Guide
 
 ## Prerequisites
 - MongoDB should be running (ports 27017 and 27018)
@@ -25,33 +25,7 @@ The backend will be running on `http://localhost:8080`
 
 ---
 
-### Step 2: Register a User (Optional - if you haven't already)
-
-Open a **NEW terminal window** (keep the backend running) and run:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"username":"testuser","password":"testpass"}'
-```
-
-**Expected Response:**
-- Success: `"User registered"`
-- If user exists: `"User already exists"`
-
-**Alternative: Using a single line (easier to copy):**
-```bash
-curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d '{"username":"testuser","password":"testpass"}'
-```
-
-**To register a different user:**
-```bash
-curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d '{"username":"admin","password":"admin123"}'
-```
-
----
-
-### Step 3: Start the Frontend Dashboard
+### Step 2: Start the Frontend Dashboard
 
 Open a **NEW terminal window** (keep backend running) and run:
 
@@ -66,6 +40,37 @@ Wait until you see: `Ready on http://localhost:3000`
 **Keep this terminal window open too!**
 
 ---
+
+## Signup Functionality
+
+### Step 3: Test Signup in Browser
+
+1. Open your web browser
+2. Go to: `http://localhost:3000/signup`
+   - **OR** click "Sign Up" link from the login page
+3. You should see a signup form with:
+   - Username field
+   - Password field
+   - Confirm Password field
+   - Sign Up button
+   - Link to login page
+
+4. Fill in the form:
+   - **Username:** Choose a unique username (e.g., `newuser`)
+   - **Password:** Enter a password (minimum 3 characters)
+   - **Confirm Password:** Re-enter the same password
+
+5. Click the **"Sign Up"** button
+
+**What should happen:**
+- ✅ If successful: You'll see a green success message and be redirected to `/login` page after 1.5 seconds
+- ❌ If username exists: You'll see "User already exists" error
+- ❌ If passwords don't match: You'll see "Passwords do not match" error
+- ❌ If password too short: You'll see "Password must be at least 3 characters" error
+
+---
+
+## Login Functionality
 
 ### Step 4: Test Login in Browser
 
@@ -89,7 +94,7 @@ Wait until you see: `Ready on http://localhost:3000`
 
 ---
 
-### Step 5: Verify Token Storage
+### Step 5: Verify Token Storage (After Login)
 
 After successful login, verify the token is stored:
 
@@ -154,15 +159,23 @@ If you see an error:
 
 ## Quick Test Commands
 
-**Register a user:**
+**Register a user via API (alternative to web signup):**
 ```bash
 curl -X POST http://localhost:8080/api/auth/register -H "Content-Type: application/json" -d '{"username":"testuser","password":"testpass"}'
 ```
 
-**Login:**
+**Expected Response (JSON):**
+- Success: `{"message":"User registered successfully"}`
+- Error: `{"error":"User already exists"}` or `{"error":"username missing"}`
+
+**Login via API:**
 ```bash
 curl -X POST http://localhost:8080/api/auth/login -H "Content-Type: application/json" -d '{"username":"testuser","password":"testpass"}'
 ```
+
+**Expected Response (JSON):**
+- Success: `{"token":"eyJhbGciOiJIUzI1NiJ9..."}`
+- Error: `{"error":"Invalid username or password"}`
 
 **Check if backend is running:**
 ```bash
