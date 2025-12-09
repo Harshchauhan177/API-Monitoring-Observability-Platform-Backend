@@ -16,6 +16,9 @@ export default function RootLayout({
         <aside className="w-64 h-screen bg-gray-900 text-white p-6 flex flex-col gap-4">
           <h1 className="text-xl font-bold mb-4">Dashboard</h1>
 
+          <a href="/dashboard" className="hover:text-blue-400">
+            Overview
+          </a>
           <a href="/logs" className="hover:text-blue-400">
             Logs
           </a>

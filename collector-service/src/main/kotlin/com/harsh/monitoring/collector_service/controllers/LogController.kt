@@ -85,4 +85,27 @@ class LogController(
 
     @GetMapping("/all")
     fun getAllLogs(): List<LogEntry> = logRepo.findAll()
+
+    @GetMapping("/filtered")
+    fun getFilteredLogs(
+        @RequestParam(required = false) serviceName: String?,
+        @RequestParam(required = false) endpoint: String?,
+        @RequestParam(required = false) startDate: Long?,
+        @RequestParam(required = false) endDate: Long?,
+        @RequestParam(required = false) statusCode: Int?,
+        @RequestParam(required = false, defaultValue = "false") slowOnly: Boolean,
+        @RequestParam(required = false, defaultValue = "false") brokenOnly: Boolean,
+        @RequestParam(required = false, defaultValue = "false") rateLimitOnly: Boolean
+    ): List<LogEntry> {
+        return logRepo.findFiltered(
+            serviceName = serviceName,
+            endpoint = endpoint,
+            startDate = startDate,
+            endDate = endDate,
+            statusCode = statusCode,
+            slowOnly = slowOnly,
+            brokenOnly = brokenOnly,
+            rateLimitOnly = rateLimitOnly
+        )
+    }
 }

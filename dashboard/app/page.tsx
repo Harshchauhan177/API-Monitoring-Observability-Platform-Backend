@@ -11,8 +11,8 @@ export default function Home() {
     const token = localStorage.getItem("token");
     
     if (token) {
-      // User is logged in, redirect to logs page
-      router.push("/logs");
+      // User is logged in, redirect to dashboard page
+      router.push("/dashboard");
     } else {
       // User is not logged in, redirect to login page
       router.push("/login");

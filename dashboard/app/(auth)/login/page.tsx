@@ -32,7 +32,7 @@ export default function LoginPage() {
 
       if (data.token) {
         localStorage.setItem("token", data.token);
-        window.location.href = "/logs";
+        window.location.href = "/dashboard";
       } else {
         setError(data.error || "Invalid username or password");
       }

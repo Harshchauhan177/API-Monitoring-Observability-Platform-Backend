@@ -1,0 +1,7 @@
+monitoring:
+  collector:
+    url: http://localhost:8080
+  rateLimit:
+    service: sample-service  # Change this per service
+    limit: 100              # Requests per second
+
