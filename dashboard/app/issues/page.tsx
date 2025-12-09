@@ -103,8 +103,8 @@ export default function IssuesPage() {
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <h2 className="font-bold text-lg text-orange-600 mb-3">
-                  ⚠️ Issue in {issue.serviceName}
-                </h2>
+              ⚠️ Issue in {issue.serviceName}
+            </h2>
 
                 <div className="space-y-2">
                   <p className="text-gray-800 font-medium">
@@ -119,8 +119,8 @@ export default function IssuesPage() {
 
                   {issue.timestamp && (
                     <p className="text-gray-600 text-sm mt-3 font-medium">
-                      {new Date(issue.timestamp).toLocaleString()}
-                    </p>
+              {new Date(issue.timestamp).toLocaleString()}
+            </p>
                   )}
                 </div>
               </div>
