@@ -8,19 +8,25 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   async function login() {
-    const res = await fetch("http://localhost:8080/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      setError(""); // Clear previous errors
+      
+      const res = await fetch("http://localhost:8080/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      window.location.href = "/logs";
-    } else {
-      setError("Invalid username or password");
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        window.location.href = "/logs";
+      } else {
+        setError(data.error || "Invalid username or password");
+      }
+    } catch (err) {
+      setError("Failed to connect to server. Please try again.");
     }
   }
 
