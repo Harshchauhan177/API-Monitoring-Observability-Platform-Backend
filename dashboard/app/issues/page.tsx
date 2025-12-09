@@ -81,49 +81,53 @@ export default function IssuesPage() {
 
   if (loading) {
     return (
-      <div className="p-6">
-        <p className="text-gray-600">Loading issues...</p>
+      <div className="p-6 bg-gray-50 min-h-screen">
+        <p className="text-gray-700 font-medium">Loading issues...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Unresolved API Issues</h1>
+    <div className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-2xl font-semibold mb-4 text-gray-900">Unresolved API Issues</h1>
 
       {issues.length === 0 && (
-        <p className="text-gray-600">No unresolved issues 🎉</p>
+        <div className="bg-white p-8 rounded-lg shadow-lg text-center">
+          <p className="text-gray-600 text-lg">No unresolved issues 🎉</p>
+        </div>
       )}
 
       <div className="grid grid-cols-1 gap-4">
         {issues.map((issue) => (
-          <div key={issue.id} className="p-4 border rounded-lg bg-white shadow">
+          <div key={issue.id} className="p-5 border-2 border-orange-200 rounded-lg bg-white shadow-lg hover:shadow-xl transition-shadow">
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <h2 className="font-bold text-lg text-orange-600">
+                <h2 className="font-bold text-lg text-orange-600 mb-3">
                   ⚠️ Issue in {issue.serviceName}
                 </h2>
 
-                <p className="text-gray-700 mt-2">
-                  <strong>Endpoint:</strong> {issue.endpoint || "N/A"}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Type:</strong> {issue.issueType}
-                </p>
-                <p className="font-semibold text-red-700 mt-2">
-                  {issue.errorMessage}
-                </p>
-
-                {issue.timestamp && (
-                  <p className="text-gray-500 text-sm mt-2">
-                    {new Date(issue.timestamp).toLocaleString()}
+                <div className="space-y-2">
+                  <p className="text-gray-800 font-medium">
+                    <span className="text-gray-600">Endpoint:</span> {issue.endpoint || "N/A"}
                   </p>
-                )}
+                  <p className="text-gray-800 font-medium">
+                    <span className="text-gray-600">Type:</span> <span className="uppercase">{issue.issueType.replace('_', ' ')}</span>
+                  </p>
+                  <p className="font-semibold text-red-700 mt-3 p-2 bg-red-50 rounded text-base">
+                    {issue.errorMessage}
+                  </p>
+
+                  {issue.timestamp && (
+                    <p className="text-gray-600 text-sm mt-3 font-medium">
+                      {new Date(issue.timestamp).toLocaleString()}
+                    </p>
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => resolveIssue(issue.id!, issue.version)}
                 disabled={resolving === issue.id}
-                className="ml-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="ml-4 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg transition-all"
               >
                 {resolving === issue.id ? "Resolving..." : "Mark as Resolved"}
               </button>
