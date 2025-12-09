@@ -47,6 +47,6 @@ Content-Type: application/json
   "serviceName": "kuchbhi",
   "endpoint": "/process",
   "method": "POST",
-  "statusCode": 600,
+  "statusCode": 900,
   "latencyMs": 219
 }
