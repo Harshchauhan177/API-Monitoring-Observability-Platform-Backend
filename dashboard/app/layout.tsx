@@ -1,4 +1,5 @@
 import "./globals.css";
+import LogoutButton from "./components/LogoutButton";
 
 export const metadata = {
   title: "API Monitoring Dashboard",
@@ -24,9 +25,7 @@ export default function RootLayout({
           <a href="/issues" className="hover:text-blue-400">
             Issues
           </a>
-          <a href="/login" className="hover:text-blue-400 mt-auto">
-            Logout
-          </a>
+          <LogoutButton />
         </aside>
 
         <main className="flex-1 p-6">{children}</main>

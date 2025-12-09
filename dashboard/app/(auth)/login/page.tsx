@@ -1,12 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    // If user is already logged in, redirect to logs
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.push("/logs");
+    }
+  }, [router]);
 
   async function login() {
     try {
