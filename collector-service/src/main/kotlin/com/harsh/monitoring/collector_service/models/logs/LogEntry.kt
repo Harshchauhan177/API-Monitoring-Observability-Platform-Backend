@@ -9,6 +9,8 @@ data class LogEntry(
     val serviceName: String,
     val endpoint: String,
     val method: String,
+    val requestSize: Long = 0,
+    val responseSize: Long = 0,
     val statusCode: Int,
     val latencyMs: Long,
     val timestamp: Long = System.currentTimeMillis()

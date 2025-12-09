@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.data.mongodb.MongoDatabaseFactory
+import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
 
@@ -27,6 +28,11 @@ class MongoConfig {
     fun logsMongoTemplate(): MongoTemplate =
         MongoTemplate(logsDatabaseFactory())
 
+    @Bean(name = ["logsTransactionManager"])
+    @Primary
+    fun logsTransactionManager(): MongoTransactionManager =
+        MongoTransactionManager(logsDatabaseFactory())
+
 
     // ----- METADATA DB -----
     @Bean(name = ["metadataMongoClient"])
@@ -40,4 +46,8 @@ class MongoConfig {
     @Bean(name = ["metadataMongoTemplate"])
     fun metadataMongoTemplate(): MongoTemplate =
         MongoTemplate(metadataDatabaseFactory())
+
+    @Bean(name = ["metadataTransactionManager"])
+    fun metadataTransactionManager(): MongoTransactionManager =
+        MongoTransactionManager(metadataDatabaseFactory())
 }

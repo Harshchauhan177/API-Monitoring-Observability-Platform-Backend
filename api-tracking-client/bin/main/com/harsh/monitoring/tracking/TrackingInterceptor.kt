@@ -30,12 +30,21 @@ class TrackingInterceptor(
         val startTime = request.getAttribute("startTime") as Long
         val latency = System.currentTimeMillis() - startTime
 
+        // Get request size
+        val requestSize = request.contentLengthLong.takeIf { it >= 0 } ?: 0
+
+        // Get response size from Content-Length header if available
+        // Note: For accurate response size, a response wrapper filter would be needed
+        // This is a best-effort approach using headers
+        val responseSizeHeader = response.getHeader("Content-Length")
+        val responseSize = responseSizeHeader?.toLongOrNull() ?: 0
+
         val log = LogEvent(
             serviceName = serviceName,
             endpoint = request.requestURI,
             method = request.method,
-            requestSize = request.contentLengthLong.takeIf { it >= 0 } ?: 0,
-            responseSize = response.contentType?.length?.toLong() ?: 0,
+            requestSize = requestSize,
+            responseSize = responseSize,
             statusCode = response.status,
             latencyMs = latency,
             timestamp = System.currentTimeMillis()

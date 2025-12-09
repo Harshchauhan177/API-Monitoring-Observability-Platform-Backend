@@ -12,7 +12,15 @@ data class DashboardStats(
     val rateLimitViolations: Long,
     val avgLatencyPerEndpoint: Map<String, Double>,
     val top5SlowEndpoints: List<EndpointStats>,
-    val errorRate: Double
+    val errorRate: Double,
+    val errorRateOverTime: List<ErrorRateDataPoint> = emptyList()
+)
+
+data class ErrorRateDataPoint(
+    val timestamp: Long,
+    val errorRate: Double,
+    val totalRequests: Long,
+    val errorRequests: Long
 )
 
 data class EndpointStats(
@@ -73,13 +81,32 @@ class DashboardController(
             0.0
         }
 
+        // Error rate over time (last 24 hours, grouped by hour)
+        val now = System.currentTimeMillis()
+        val oneDayAgo = now - (24 * 60 * 60 * 1000)
+        val errorRateOverTime = allLogs
+            .filter { it.timestamp >= oneDayAgo }
+            .groupBy { (it.timestamp / (60 * 60 * 1000)) * (60 * 60 * 1000) } // Group by hour
+            .map { (hourTimestamp, logs) ->
+                val total = logs.size.toLong()
+                val errors = logs.count { it.statusCode >= 500 }.toLong()
+                ErrorRateDataPoint(
+                    timestamp = hourTimestamp,
+                    errorRate = if (total > 0) (errors.toDouble() / total) * 100 else 0.0,
+                    totalRequests = total,
+                    errorRequests = errors
+                )
+            }
+            .sortedBy { it.timestamp }
+
         return DashboardStats(
             slowApiCount = slowApiCount.toLong(),
             brokenApiCount = brokenApiCount.toLong(),
             rateLimitViolations = rateLimitViolations,
             avgLatencyPerEndpoint = avgLatencyPerEndpoint,
             top5SlowEndpoints = top5SlowEndpoints,
-            errorRate = errorRate
+            errorRate = errorRate,
+            errorRateOverTime = errorRateOverTime
         )
     }
 }

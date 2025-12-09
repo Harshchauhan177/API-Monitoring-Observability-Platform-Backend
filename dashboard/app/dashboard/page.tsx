@@ -15,6 +15,12 @@ interface DashboardStats {
     requestCount: number;
   }>;
   errorRate: number;
+  errorRateOverTime: Array<{
+    timestamp: number;
+    errorRate: number;
+    totalRequests: number;
+    errorRequests: number;
+  }>;
 }
 
 export default function DashboardPage() {
@@ -129,6 +135,46 @@ export default function DashboardPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+      </div>
+
+      {/* Error Rate Graph */}
+      <div className="bg-white p-6 rounded-lg shadow mb-6">
+        <h2 className="text-xl font-bold mb-4">Error Rate Over Time (Last 24 Hours)</h2>
+        {stats.errorRateOverTime.length === 0 ? (
+          <p className="text-gray-600">No error rate data available</p>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-end justify-between h-64 border-b-2 border-l-2 border-gray-300 pb-2 pl-2">
+              {stats.errorRateOverTime.map((point, idx) => {
+                const maxErrorRate = Math.max(...stats.errorRateOverTime.map(p => p.errorRate), 1);
+                const heightPercent = maxErrorRate > 0 ? (point.errorRate / maxErrorRate) * 100 : 0;
+                return (
+                  <div key={idx} className="flex flex-col items-center flex-1 mx-1">
+                    <div
+                      className="w-full bg-red-500 rounded-t hover:bg-red-600 transition-colors relative group"
+                      style={{ height: `${Math.max(heightPercent, 2)}%` }}
+                      title={`${point.errorRate.toFixed(2)}% (${point.errorRequests}/${point.totalRequests})`}
+                    >
+                      <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
+                        {point.errorRate.toFixed(2)}%
+                        <br />
+                        {point.errorRequests}/{point.totalRequests} errors
+                      </div>
+                    </div>
+                    <span className="text-xs text-gray-500 mt-1 transform -rotate-45 origin-top-left whitespace-nowrap">
+                      {new Date(point.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>0%</span>
+              <span>Time (Last 24 Hours)</span>
+              <span>{Math.max(...stats.errorRateOverTime.map(p => p.errorRate), 0).toFixed(1)}%</span>
+            </div>
           </div>
         )}
       </div>

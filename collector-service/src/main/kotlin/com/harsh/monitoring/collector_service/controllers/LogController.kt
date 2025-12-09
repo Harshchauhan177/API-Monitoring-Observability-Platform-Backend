@@ -78,6 +78,7 @@ class LogController(
     @PostMapping("/rate-limit")
     fun saveRateLimitHit(@RequestBody hit: RateLimitHit): String {
         rateRepo.save(hit)
+        rateRepo.save(hit)
 
         saveAlertWithAudit(
             Alert(
